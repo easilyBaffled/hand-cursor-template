@@ -30,8 +30,18 @@ const createControlPanel = (controlsElement, hands) =>
       hands.setOptions(options);
     });
 
-export function configureMediaPipe(setHandData, controlElement, eventConfig) {
+export function configureMediaPipe(
+  setHandData,
+  controlElement,
+  eventConfig,
+  isLoading,
+  setLoading
+) {
   const hands = new mpHands.Hands(config);
-  hands.onResults(onFrame(setHandData, eventConfig));
+  hands.onResults((res) => {
+    if (isLoading) setLoading(false);
+
+    onFrame(setHandData, eventConfig, setLoading)(res);
+  });
   createControlPanel(controlElement, hands);
 }

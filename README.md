@@ -1,3 +1,7 @@
-# vitejs-vite-pmdwrx
+# Hand Cursor Template
 
-[Edit on StackBlitz ⚡️](https://stackblitz.com/edit/vitejs-vite-pmdwrx)
+Still figuring out the best way to connect the hand tracking
+
+# Next
+
+- [ ] add loading for hand tracking (ref: https://codepen.io/mediapipe/pen/RwGWYJw?editors=0010)
