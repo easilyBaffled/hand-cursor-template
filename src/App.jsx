@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import './App.css';
 import { configureMediaPipe } from './features/mediapipe';
 import { DebugCanvas } from './components/ThreeDebug';

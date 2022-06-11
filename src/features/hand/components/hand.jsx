@@ -1,5 +1,5 @@
 import { Point } from './point';
-import { linearScale } from '../../../linearScale';
+import { linearScale } from '../../../utils/linearScale';
 
 const palmPoints = [0, 5, 9, 13, 17];
 function get_polygon_centroid(handData) {

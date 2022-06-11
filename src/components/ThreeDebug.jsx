@@ -3,7 +3,7 @@ import { Text, OrthographicCamera } from '@react-three/drei';
 import { Canvas, useLoader, useFrame } from '@react-three/fiber';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { Hands } from '../features/hand';
-import { linearScale } from '../linearScale';
+import { linearScale } from '../utils/linearScale';
 
 const ASSETS_PATH = 'https://assets.codepen.io/430361/';
 
@@ -98,4 +98,3 @@ export function DebugCanvas({ children, handData }) {
     </Canvas>
   );
 }
-
