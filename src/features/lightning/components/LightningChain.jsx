@@ -1,6 +1,6 @@
 import './style.css';
 import { Vector2 } from 'three';
-import { useEffect } from 'react';
+import { useElement } from '../../../hooks/useElement';
 import SimplexNoise from 'simplex-noise';
 
 /**
@@ -19,32 +19,22 @@ window.requestAnimationFrame = (function () {
   );
 })();
 
-/**
- * Point
- */
-function Point(x, y, radius) {
-  Vector2.call(this, x, y);
+class Point extends Vector2 {
+  constructor(x, y, radius) {
+    super(x, y);
 
-  this.radius = radius || 7;
+    this.radius = radius || 7;
 
-  this.vec = new Vector2(random(1, -1), random(1, -1)).normalize();
-  this._easeRadius = this.radius;
-  this._currentRadius = this.radius;
-}
-
-Point.prototype = (function (o) {
-  var s = new Vector2(0, 0),
-    p;
-  for (p in o) {
-    s[p] = o[p];
+    this.vec = new Vector2(random(1, -1), random(1, -1)).normalize();
+    this._easeRadius = this.radius;
+    this._currentRadius = this.radius;
   }
-  return s;
-})({
-  color: 'rgb(255, 255, 255)',
-  dragging: false,
-  _latestDrag: null,
 
-  update: function (points, bounds) {
+  color = 'rgb(255, 255, 255)';
+  dragging = false;
+  _latestDrag = null;
+
+  update(points, bounds) {
     this._currentRadius = random(this._easeRadius, this._easeRadius * 0.35);
     this._easeRadius += (this.radius - this._easeRadius) * 0.1;
 
@@ -87,34 +77,34 @@ Point.prototype = (function (o) {
       this.y = bounds.bottom;
       if (vec.y > 0) vec.y *= -1;
     }
-  },
+  }
 
-  hitTest: function (p) {
+  hitTest(p) {
     if (this.distanceToSquared(p) < 900) {
       this._easeRadius = this.radius * 2.5;
       return true;
     }
     return false;
-  },
+  }
 
-  startDrag: function () {
+  startDrag() {
     this.dragging = true;
     this.vec.set(0, 0);
     this._latestDrag = new Vector2().set(this);
-  },
+  }
 
-  drag: function (p) {
+  drag(p) {
     this._latestDrag.set(this);
     this.set(p);
-  },
+  }
 
-  endDrag: function () {
+  endDrag() {
     this.vec = Vector2.sub(this, this._latestDrag);
     this.vec.set(0, 0);
     this.dragging = false;
-  },
+  }
 
-  draw: function (ctx) {
+  draw(ctx) {
     ctx.save();
     ctx.fillStyle = this.color;
     ctx.beginPath();
@@ -128,8 +118,8 @@ Point.prototype = (function (o) {
     ctx.arc(this.x, this.y, this._currentRadius, 0, Math.PI * 2, false);
     ctx.fill();
     ctx.restore();
-  },
-});
+  }
+}
 
 /**
  * Lightning
@@ -398,53 +388,6 @@ var canvas,
   points,
   lightning,
   control;
-
-// Event Listeners
-
-function resize() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  centerX = canvas.width * 0.5;
-  centerY = canvas.height * 0.5;
-  context = canvas.getContext('2d');
-  grad = context.createRadialGradient(
-    centerX,
-    centerY,
-    0,
-    centerX,
-    centerY,
-    Math.sqrt(centerX * centerX + centerY * centerY)
-  );
-  grad.addColorStop(0, 'rgba(0, 0, 0, 0)');
-  grad.addColorStop(1, 'rgba(0, 0, 0, 0.4)');
-}
-
-function mouseMove(e) {
-  mouse.set(e.clientX, e.clientY);
-
-  var i,
-    hit = false;
-  for (i = 0; i < 2; i++) {
-    if ((!hit && points[i].hitTest(mouse)) || points[i].dragging) hit = true;
-  }
-  document.body.style.cursor = hit ? 'pointer' : 'default';
-}
-
-function mouseDown(e) {
-  for (var i = 0; i < 2; i++) {
-    if (points[i].hitTest(mouse)) {
-      points[i].startDrag();
-      return;
-    }
-  }
-}
-
-function mouseUp(e) {
-  for (var i = 0; i < 2; i++) {
-    if (points[i].dragging) points[i].endDrag();
-  }
-}
-
 // GUI Control
 
 control = {
@@ -455,12 +398,6 @@ control = {
 
 // Init
 
-canvas = document.getElementById('c');
-
-window.addEventListener('resize', resize, false);
-resize(null);
-
-bounds = new Rect(0, 0, canvas.width, canvas.height);
 mouse = new Vector2();
 
 lightning = new Lightning();
@@ -474,13 +411,11 @@ lightning.startPoint.set(points[0]);
 lightning.endPoint.set(points[1]);
 lightning.setChildNum(3);
 
-canvas.addEventListener('mousemove', mouseMove, false);
-canvas.addEventListener('mousedown', mouseDown, false);
-canvas.addEventListener('mouseup', mouseUp, false);
-
 // Start Update
 
-var loop = function () {
+var loop = function (canvas) {
+  bounds = new Rect(0, 0, canvas.width, canvas.height);
+  context = canvas.getContext('2d');
   context.save();
   context.fillStyle = control.backgroundColor;
   context.fillRect(0, 0, canvas.width, canvas.height);
@@ -509,9 +444,7 @@ var loop = function () {
 };
 
 export function Chain() {
-  useEffect(() => {
-    loop();
-  }, []);
+  useElement('#c', loop);
 
   return <canvas id="c"></canvas>;
 }
