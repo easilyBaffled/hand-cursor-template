@@ -51,9 +51,9 @@ class Point extends Vector2 {
       if (p !== this) {
         d = this.distanceToSquared(p);
         if (d < 90000) {
-          vec.add(Vector2.sub(this, p).normalize().multiplyScalar(0.03));
+          vec.add(this.sub(p).normalize().multiplyScalar(0.03));
         } else if (d > 250000) {
-          vec.add(Vector2.sub(p, this).normalize().multiplyScalar(0.015));
+          vec.add(p.sub(this).normalize().multiplyScalar(0.015));
         }
       }
     }
@@ -99,7 +99,7 @@ class Point extends Vector2 {
   }
 
   endDrag() {
-    this.vec = Vector2.sub(this, this._latestDrag);
+    this.vec = this.sub(this._latestDrag);
     this.vec.set(0, 0);
     this.dragging = false;
   }
@@ -213,7 +213,8 @@ Lightning.prototype = {
     }
 
     length = this.length();
-    normal = Vector2.sub(endPoint, startPoint)
+    normal = endPoint
+      .sub(startPoint)
       .normalize()
       .multiplyScalar(length / this.step);
     radian = normal.angle();
@@ -402,15 +403,6 @@ mouse = new Vector2();
 
 lightning = new Lightning();
 
-points = [
-  new Point(centerX - 200, centerY, lightning.lineWidth * 1.25),
-  new Point(centerX + 200, centerY, lightning.lineWidth * 1.25),
-];
-
-lightning.startPoint.set(points[0]);
-lightning.endPoint.set(points[1]);
-lightning.setChildNum(3);
-
 // Start Update
 
 var loop = function (canvas) {
@@ -440,11 +432,27 @@ var loop = function (canvas) {
     p.draw(context);
   }
 
-  requestAnimationFrame(loop);
+  requestAnimationFrame(() => loop(canvas));
 };
 
 export function Chain() {
-  useElement('#c', loop);
+  useElement('#c', (canvas) => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const centerX = canvas.width * 0.5;
+    const centerY = canvas.height * 0.5;
+
+    points = [
+      new Point(centerX - 200, centerY, lightning.lineWidth * 1.25),
+      new Point(centerX + 200, centerY, lightning.lineWidth * 1.25),
+    ];
+
+    lightning.startPoint.set(points[0]);
+    lightning.endPoint.set(points[1]);
+    lightning.setChildNum(3);
+
+    loop(canvas);
+  });
 
   return <canvas id="c"></canvas>;
 }
