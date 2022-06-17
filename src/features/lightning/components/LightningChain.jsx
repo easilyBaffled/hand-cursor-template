@@ -50,10 +50,11 @@ class Point extends Vector2 {
       p = points[i];
       if (p !== this) {
         d = this.distanceToSquared(p);
+        
         if (d < 90000) {
-          vec.add(this.sub(p).normalize().multiplyScalar(0.03));
+          vec.add(new Vector2(this).sub(p).normalize().multiplyScalar(0.03));
         } else if (d > 250000) {
-          vec.add(p.sub(this).normalize().multiplyScalar(0.015));
+          vec.add(new Vector2(p).sub(this).normalize().multiplyScalar(0.015));
         }
       }
     }
@@ -99,7 +100,7 @@ class Point extends Vector2 {
   }
 
   endDrag() {
-    this.vec = this.sub(this._latestDrag);
+    this.vec = new Vector2(this).sub(this._latestDrag);
     this.vec.set(0, 0);
     this.dragging = false;
   }
@@ -213,7 +214,7 @@ Lightning.prototype = {
     }
 
     length = this.length();
-    normal = endPoint
+    normal = new Vector2(endPoint)
       .sub(startPoint)
       .normalize()
       .multiplyScalar(length / this.step);
@@ -427,7 +428,7 @@ var loop = function (canvas) {
 
   for (i = 0; i < 2; i++) {
     p = points[i];
-    if (p.dragging) p.drag(mouse);
+    // if (p.dragging) p.drag(mouse);
     p.update(points, bounds);
     p.draw(context);
   }
